@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prana Estudio · Reservas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+:root{--fondo:#F6F1EA;--tarjeta:#FFFDF9;--texto:#2B2420;--suave:#6F625A;--borde:#E4D8CB;--acento:#B4553A;--onacento:#fff;--espera:#6B4FA3;--llena:#B7791F;--cancela:#A34848;--ok:#1F7A4D;--serif:'Young Serif',Georgia,serif;--sans:'Figtree',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--fondo:#1C1714;--tarjeta:#262019;--texto:#F0E8DF;--suave:#B5A598;--borde:#3A3028;--acento:#E08A6B;--onacento:#1B1410;--espera:#B7A0E6;--llena:#E3B04B;--cancela:#E08A8A;--ok:#6FCF97}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--texto);font:16px/1.5 var(--sans)}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 96px}
+h1,h2,h3,.num,.hora{font-family:var(--serif);font-weight:400;margin:0}
+h1{font-size:1.5rem}.marca{display:flex;gap:12px;align-items:center;margin-bottom:14px}.marca p{margin:0}.logo{width:46px;height:46px;border-radius:50%;background:var(--acento);color:var(--onacento);display:grid;place-items:center;font-size:1.5rem}h2{font-size:1.25rem;margin:24px 0 8px}h3{font-size:1.05rem}
+.tabs{display:flex;gap:6px;margin-bottom:8px}
+.tabs button{flex:1;min-height:44px;border:1px solid var(--borde);background:var(--tarjeta);color:var(--texto);border-radius:12px;font:600 1rem var(--sans);cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--acento);color:var(--onacento);border-color:var(--acento)}
+.card{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:14px;margin:10px 0}
+.row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.hora{font-size:1.6rem}.num{font-size:2.6rem;line-height:1.1}
+.suave{color:var(--suave);font-size:.92rem}
+.dots{display:flex;gap:6px;margin-top:8px}.dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--acento)}.dots i.on{background:var(--acento)}
+.bar{height:8px;border-radius:8px;background:var(--borde);overflow:hidden;margin:8px 0}.bar b{display:block;height:100%;background:var(--acento)}.bar.llena b{background:var(--llena)}
+.tag{display:inline-block;font-size:.88rem;font-weight:600;padding:2px 10px;border-radius:99px;border:1px solid currentColor}
+.t-libre{color:var(--acento)}.t-llena{color:var(--llena)}.t-espera{color:var(--espera)}.t-ins{color:var(--ok)}.t-cancel{color:var(--cancela)}
+.btn{min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--acento);background:var(--acento);color:var(--onacento);font:600 1rem var(--sans);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn.espera{background:var(--espera);border-color:var(--espera)}.btn.cancela{background:transparent;color:var(--cancela);border-color:var(--cancela)}.btn.suave{background:transparent;color:var(--acento)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.mas{color:var(--ok)}.menos{color:var(--cancela)}
+select,textarea{width:100%;min-height:44px;font:inherit;color:var(--texto);background:var(--tarjeta);border:1px solid var(--borde);border-radius:10px;padding:8px}
+label.chk{display:flex;align-items:center;gap:12px;min-height:44px}label.chk input{width:28px;height:28px}
+ul{list-style:none;margin:0;padding:0}li{padding:6px 0;border-bottom:1px solid var(--borde)}li:last-child{border:0}
+details summary{min-height:44px;display:flex;align-items:center;cursor:pointer;color:var(--acento);font-weight:600}
+:focus-visible{outline:3px solid var(--acento);outline-offset:2px}
+#toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);max-width:608px;width:calc(100% - 32px);background:var(--texto);color:var(--fondo);padding:12px 16px;border-radius:12px;display:none}
+dialog{border:1px solid var(--borde);border-radius:14px;background:var(--tarjeta);color:var(--texto);max-width:560px;width:calc(100% - 32px)}
+dialog::backdrop{background:#0008}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="marca"><div class="logo" aria-hidden="true">☾</div><div><h1>Prana Estudio</h1><p class="suave">Reserva tu lugar. Sin llamadas.</p></div></header>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-rol="alumna">Alumna</button>
+    <button role="tab" data-rol="andrea">Andrea</button>
+    <button role="tab" data-rol="instr">Instructora</button>
+  </div>
+  <main id="main"></main>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<dialog id="dlg"><form method="dialog"><h3 id="dlgT"></h3><p id="dlgP" class="suave"></p><textarea id="dlgX" rows="4" aria-label="Mensaje"></textarea><div class="row" style="margin-top:12px"><button class="btn suave" value="no">Volver</button><button class="btn" id="dlgOk" value="si">Aceptar</button></div></form></dialog>
+<script>
+// <logic>
+const H=3600000,HORAS_CANCELAR=12;let S;
+const al=id=>S.alumnas.find(a=>a.id===id),cl=id=>S.clases.find(c=>c.id===id);
+const clases=n=>n===1?'1 clase':n+' clases';
+const cuando=t=>new Date(t).toLocaleString('es',{weekday:'long',day:'numeric',month:'long',hour:'numeric',minute:'2-digit'});
+function mov(a,delta,texto){a.saldo+=delta;S.movs.push({aid:a.id,delta,texto,t:S.now})}
+function aviso(a,c,texto){S.avisos.push({id:++S.seq,aid:a.id,cid:c.id,texto,hecho:false})}
+function crearDemo(now=Date.now()){
+  const nombres=['Camila','Valentina','Mariana','Sofía','Daniela','Laura','Juliana','Paula','Natalia','Catalina','Isabela','Manuela','Carolina','Lucía','Gabriela'];
+  const saldos=[6,10,3,8,1,5,7,2,9,4,6,10,3,5,0];
+  S={now,seq:100,alumnas:[],clases:[],movs:[],avisos:[],instr:['Marina','Elena'],rec:{},stats:{enviados:0,renovaron:0}};
+  nombres.forEach((n,i)=>{S.alumnas.push({id:i+1,nombre:n,tel:'57300555'+(1000+i),saldo:saldos[i]});
+    S.movs.push({aid:i+1,delta:10,texto:'Compra de paquete de 10',t:now-20*24*H});
+    if(saldos[i]<10)S.movs.push({aid:i+1,delta:-(10-saldos[i]),texto:'Clases usadas',t:now-5*24*H})});
+  const d=new Date(now),ini=(o,h,m)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+o,h,m).getTime();
+  const def=[['Vinyasa','Elena',0,18,0,[2,4,6],[]],['Vinyasa tarde','Marina',1,18,0,[1,2,3,4,5,6,7,8,9,10,11,12],[13,14]],
+    ['Yin yoga','Elena',1,19,30,[1,3],[]],['Hatha suave','Marina',2,8,0,[],[]],['Restaurativo','Elena',3,18,0,[],[]]];
+  def.forEach(([nombre,instr,o,h,m,ins,esp],i)=>{const t=ini(o,h,m);if(t>now)S.clases.push({id:i+1,nombre,instr,ini:t,cupo:12,estado:'activa',ins:[...ins],esp:[...esp],asis:{}})});
+  return S;
+}
+function reservar(aid,cid){
+  const a=al(aid),c=cl(cid);S.now=Date.now();
+  if(c.estado!=='activa'||c.ini<=S.now)return{ok:false,msg:'Esta clase ya no está disponible.'};
+  if(c.ins.includes(aid)||c.esp.includes(aid))return{ok:false,msg:'Ya estás en esta clase.'};
+  if(a.saldo<1)return{ok:false,msg:'No tienes clases disponibles. Pide tu paquete a Andrea.'};
+  if(c.ins.length<c.cupo){c.ins.push(aid);mov(a,-1,'Reserva: '+c.nombre);return{ok:true,msg:`Reservado. Te quedan ${clases(a.saldo)}.`}}
+  c.esp.push(aid);return{ok:true,msg:`Estás en lista de espera, puesto ${c.esp.length}. No se descuenta ninguna clase hasta que tengas lugar.`};
+}
+function promover(c){
+  while(c.ins.length<c.cupo&&c.esp.length){const a=al(c.esp.shift());if(a.saldo<1)continue;
+    c.ins.push(a.id);mov(a,-1,'Reserva (salió de espera): '+c.nombre);
+    aviso(a,c,`Hola ${a.nombre}, se liberó un lugar y ya estás inscrita en ${c.nombre} (${cuando(c.ini)}). Se descontó 1 clase.`)}
+}
+function cancelar(aid,cid){
+  const a=al(aid),c=cl(cid);S.now=Date.now();
+  if(c.esp.includes(aid)){c.esp=c.esp.filter(x=>x!==aid);return{ok:true,msg:'Saliste de la lista de espera.'}}
+  if(!c.ins.includes(aid)||c.estado!=='activa')return{ok:false,msg:'No puedes cancelar esta clase.'};
+  c.ins=c.ins.filter(x=>x!==aid);delete c.asis[aid];
+  let msg;
+  if((c.ini-S.now)/H>=HORAS_CANCELAR){mov(a,1,'Devolución: '+c.nombre);msg=`Cancelado. Se devolvió 1 clase. Te quedan ${clases(a.saldo)}.`}
+  else msg=`Cancelado. Faltaban menos de ${HORAS_CANCELAR} horas, por eso no se devuelve la clase.`;
+  promover(c);return{ok:true,msg};
+}
+function cancelarClase(cid){
+  const c=cl(cid);if(c.estado!=='activa')return{ok:false,msg:'La clase ya estaba cancelada.'};
+  c.estado='cancelada';
+  c.ins.forEach(id=>{const a=al(id);mov(a,1,'Clase cancelada: '+c.nombre);aviso(a,c,`Hola ${a.nombre}, la clase ${c.nombre} (${cuando(c.ini)}) se canceló. Te devolvimos 1 clase.`)});
+  c.esp.forEach(id=>{const a=al(id);aviso(a,c,`Hola ${a.nombre}, la clase ${c.nombre} (${cuando(c.ini)}) se canceló. No se descontó ninguna clase.`)});
+  const n=c.ins.length;c.esp=[];return{ok:true,msg:`Clase cancelada. Se devolvió 1 clase a ${n} inscritas. Avisos listos.`};
+}
+function avisarClase(cid,texto){
+  const c=cl(cid);const ids=[...c.ins,...c.esp];
+  ids.forEach(id=>aviso(al(id),c,texto));return{ok:true,n:ids.length,msg:ids.length?`Avisos listos para ${ids.length} alumnas.`:'Esta clase no tiene inscritas.'};
+}
+function porRenovar(){return S.alumnas.filter(a=>a.saldo<=2).sort((x,y)=>x.saldo-y.saldo)}
+function textoRenovar(a){return `Hola ${a.nombre}, te quedan ${clases(a.saldo)} en Prana Estudio. Si quieres seguir con tus clases, renueva tu paquete de 10 con Andrea. ¡Te esperamos!`}
+function recordar(aid){const a=al(aid);if(!S.rec[aid]){S.rec[aid]=Date.now();S.stats.enviados++}return{ok:true,texto:textoRenovar(a)}}
+function venderPaquete(aid){const a=al(aid);S.now=Date.now();mov(a,10,'Compra de paquete de 10');if(S.rec[aid]){S.stats.renovaron++;delete S.rec[aid]}return{ok:true,msg:`Paquete registrado. ${a.nombre} tiene ${clases(a.saldo)}.`}}
+const API={porRenovar,textoRenovar,recordar,crearDemo,reservar,cancelar,cancelarClase,avisarClase,venderPaquete,get S(){return S}};
+// </logic>
+
+// ---------- Interfaz ----------
+const $=s=>document.querySelector(s);
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ROLES=['alumna','andrea','instr'];let rol=ROLES.includes(location.hash.slice(1))?location.hash.slice(1):'alumna',aid=1,instr='Marina';
+const hh=t=>new Date(t).toLocaleTimeString('es',{hour:'numeric',minute:'2-digit'});
+const dia=t=>{const f=x=>new Date(x).setHours(0,0,0,0),n=Math.round((f(t)-f(Date.now()))/(24*H));
+  return n===0?'Hoy':n===1?'Mañana':new Date(t).toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'})};
+const fmtMov=m=>`<li class="row"><span>${esc(m.texto)}<br><span class="suave">${new Date(m.t).toLocaleDateString('es',{day:'numeric',month:'short'})}</span></span><b class="${m.delta>0?'mas':'menos'}">${m.delta>0?'+':'−'}${Math.abs(m.delta)}</b></li>`;
+const historial=id=>{const l=S.movs.filter(m=>m.aid===id).reverse();return l.length?`<ul>${l.map(fmtMov).join('')}</ul>`:'<p class="suave">Todavía no hay movimientos.</p>'};
+const wa=a=>`https://wa.me/${a.tel}?text=${encodeURIComponent(a.texto)}`;
+
+function listaAvisos(filtro){
+  const l=S.avisos.filter(x=>!x.hecho&&filtro(cl(x.cid)));
+  return `<h2>Avisos pendientes</h2>`+(l.length?l.map(x=>{const a=al(x.aid);
+    return `<div class="card row"><div><b>${esc(a.nombre)}</b><br><span class="suave">${esc(cl(x.cid).nombre)}</span></div><a class="btn" target="_blank" rel="noopener" href="${wa({tel:a.tel,texto:x.texto})}" data-act="hecho" data-id="${x.id}">Abrir WhatsApp</a></div>`}).join(''):'<p class="suave">No hay avisos pendientes. Usa "Avisar a inscritas" para preparar uno.</p>');
+}
+
+function vAlumna(){
+  const a=al(aid),proximas=S.clases.filter(c=>c.ini>Date.now()).sort((x,y)=>x.ini-y.ini);
+  let h=`<label class="suave" for="quien">Estás viendo como</label><select id="quien" data-act="quien">${S.alumnas.map(x=>`<option value="${x.id}" ${x.id===aid?'selected':''}>${esc(x.nombre)}</option>`).join('')}</select>`;
+  h+=`<div class="card"><div class="num">${a.saldo}</div><div>${a.saldo===1?'clase disponible':'clases disponibles'}</div><div class="dots" aria-hidden="true">${Array.from({length:10},(_,i)=>`<i class="${i<Math.min(a.saldo,10)?'on':''}"></i>`).join('')}</div></div>`;
+  if(a.saldo<1)h+='<div class="card t-llena"><b>Pide tu paquete a Andrea</b><br><span class="suave">Con saldo 0 no puedes reservar ni entrar a lista de espera.</span></div>';
+  const prox=proximas.find(c=>c.ins.includes(aid)&&c.estado==='activa');
+  if(prox)h+=`<div class="card"><span class="suave">Tu próxima clase</span><div class="hora">${esc(dia(prox.ini))}, ${hh(prox.ini)}</div><div>${esc(prox.nombre)} · ${esc(prox.instr)}</div></div>`;
+  h+='<h2>Próximas clases</h2>';let ult='';
+  if(!proximas.length)h+='<p class="suave">No hay clases próximas. Andrea las publicará pronto.</p>';
+  proximas.forEach(c=>{const d=dia(c.ini);if(d!==ult){h+=`<h3 style="margin-top:16px">${esc(d)}</h3>`;ult=d}
+    const llena=c.ins.length>=c.cupo,pos=c.esp.indexOf(a.id)+1,ins=c.ins.includes(a.id);
+    let tag,btn;
+    if(c.estado==='cancelada'){tag='<span class="tag t-cancel">Cancelada</span>';btn=''}
+    else if(ins){tag='<span class="tag t-ins">Inscrita</span>';btn=`<button class="btn cancela" data-act="cancelar" data-c="${c.id}">Cancelar</button>`}
+    else if(pos){tag=`<span class="tag t-espera">En espera, puesto ${pos}</span>`;btn=`<button class="btn cancela" data-act="cancelar" data-c="${c.id}">Salir de la lista de espera</button>`}
+    else if(llena){tag=`<span class="tag t-llena">Llena${c.esp.length?` · ${c.esp.length} en espera`:''}</span>`;btn=`<button class="btn espera" data-act="reservar" data-c="${c.id}">Entrar a lista de espera</button>`}
+    else{const l=c.cupo-c.ins.length;tag=`<span class="tag t-libre">${l===1?'1 lugar libre':l+' lugares libres'}</span>`;btn=`<button class="btn" data-act="reservar" data-c="${c.id}">Reservar</button>`}
+    h+=`<div class="card"><div class="row"><span class="hora">${hh(c.ini)}</span>${tag}</div><div>${esc(c.nombre)} · ${esc(c.instr)}</div><div class="bar ${llena?'llena':''}" aria-hidden="true"><b style="width:${c.ins.length/c.cupo*100}%"></b></div><div class="row"><span class="suave">${c.ins.length} de ${c.cupo} lugares</span>${btn}</div></div>`});
+  return h+`<h2>Mi historial</h2><div class="card">${historial(aid)}</div>`;
+}
+
+function secRenovar(){const l=porRenovar();
+  return '<h2>Por renovar</h2>'+(l.length?l.map(a=>`<div class="card row"><div><b>${esc(a.nombre)}</b><br><span class="suave">${a.saldo===0?'Sin clases':a.saldo===1?'Le queda 1 clase':'Le quedan 2 clases'}</span></div>`+(S.rec[a.id]?'<span class="tag t-ins">Recordada hoy</span>':`<a class="btn" target="_blank" rel="noopener" href="${wa({tel:a.tel,texto:textoRenovar(a)})}" data-act="recordar" data-a="${a.id}">Recordar por WhatsApp</a>`)+'</div>').join(''):'<p class="suave">Todas tienen clases. Nada por renovar.</p>')+`<p class="suave">Recordatorios enviados: ${S.stats.enviados} · Renovaron: ${S.stats.renovaron}</p>`}
+function vAndrea(){
+  const hoy=S.clases.filter(c=>c.estado==='activa'&&dia(c.ini)==='Hoy');
+  let h=`<div class="card"><span class="suave">Hoy</span><div class="hora">${hoy.length===1?'1 clase':hoy.length+' clases'}</div><div class="suave">${hoy.reduce((n,c)=>n+c.ins.length,0)} inscritas${hoy.some(c=>c.esp.length)?' · hay lista de espera':''}</div></div>`+secRenovar()+listaAvisos(()=>true)+'<h2>Clases</h2>';
+  S.clases.filter(c=>c.ini>Date.now()).sort((x,y)=>x.ini-y.ini).forEach(c=>{
+    h+=`<div class="card"><div class="row"><b>${esc(dia(c.ini))}, ${hh(c.ini)} · ${esc(c.nombre)}</b>${c.estado==='cancelada'?'<span class="tag t-cancel">Cancelada</span>':''}</div><div class="suave">${esc(c.instr)} · ${c.ins.length} de ${c.cupo} inscritas${c.esp.length?` · ${c.esp.length} en espera`:''}</div>`+
+    (c.estado==='activa'?`<div class="row" style="margin-top:8px"><button class="btn suave" data-act="avisar" data-c="${c.id}">Avisar a inscritas</button><button class="btn cancela" data-act="cancelarClase" data-c="${c.id}">Cancelar clase</button></div>`:'')+'</div>'});
+  h+='<h2>Alumnas</h2>';
+  S.alumnas.forEach(a=>{h+=`<div class="card"><div class="row"><div><b>${esc(a.nombre)}</b><br><span class="suave">${a.saldo===1?'1 clase':a.saldo+' clases'}</span></div><button class="btn" data-act="vender" data-a="${a.id}">Vender paquete de 10</button></div><details><summary>Ver historial</summary>${historial(a.id)}</details></div>`});
+  return h;
+}
+
+function vInstr(){
+  let h=`<div class="tabs">${S.instr.map(n=>`<button data-act="instr" data-n="${n}" aria-pressed="${n===instr}" style="${n===instr?'background:var(--acento);color:var(--onacento)':''}">${n}</button>`).join('')}</div>`;
+  h+=listaAvisos(c=>c.instr===instr)+'<h2>Mis clases</h2>';
+  const mias=S.clases.filter(c=>c.instr===instr&&c.ini>Date.now()-H).sort((x,y)=>x.ini-y.ini);
+  if(!mias.length)h+='<p class="suave">No tienes clases próximas.</p>';
+  mias.forEach(c=>{h+=`<div class="card"><b>${esc(dia(c.ini))}, ${hh(c.ini)} · ${esc(c.nombre)}</b>${c.estado==='cancelada'?' <span class="tag t-cancel">Cancelada</span>':''}`+
+    (c.ins.length?c.ins.map(id=>`<label class="chk"><input type="checkbox" data-act="asis" data-c="${c.id}" data-a="${id}" ${c.asis[id]?'checked':''}> ${esc(al(id).nombre)}</label>`).join(''):'<p class="suave">Todavía no hay inscritas.</p>')+
+    (c.estado==='activa'?`<button class="btn" style="margin-top:8px" data-act="avisar" data-c="${c.id}">Avisar a mis inscritas</button>`:'')+'</div>'});
+  return h;
+}
+
+function render(){
+  $('#main').innerHTML=rol==='alumna'?vAlumna():rol==='andrea'?vAndrea():vInstr();
+  document.querySelectorAll('[data-rol]').forEach(b=>b.setAttribute('aria-selected',b.dataset.rol===rol));
+}
+let tt;const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',4500)};
+function pedir({titulo,texto='',conTexto=false,valor='',boton='Aceptar'},cb){
+  $('#dlgT').textContent=titulo;$('#dlgP').textContent=texto;const x=$('#dlgX');x.hidden=!conTexto;x.value=valor;$('#dlgOk').textContent=boton;
+  const d=$('#dlg');d.returnValue='';d.onclose=()=>{if(d.returnValue==='si')cb(x.value)};d.showModal();
+}
+const res=r=>{toast(r.msg);render()};
+
+document.addEventListener('click',e=>{
+  const r=e.target.closest('[data-rol]');if(r){rol=r.dataset.rol;history.replaceState(null,'','#'+rol);render();return}
+  const b=e.target.closest('[data-act]');if(!b||b.tagName==='SELECT'||b.type==='checkbox')return;
+  const act=b.dataset.act,c=+b.dataset.c;
+  if(act==='reservar')res(reservar(aid,c));
+  else if(act==='cancelar'){const k=cl(c);pedir({titulo:'¿Cancelar tu reserva?',texto:k.ins.includes(aid)?`Si faltan menos de ${HORAS_CANCELAR} horas, no se devuelve la clase.`:'No se descuenta nada.',boton:'Cancelar reserva'},()=>res(cancelar(aid,c)))}
+  else if(act==='vender')res(venderPaquete(+b.dataset.a));
+  else if(act==='cancelarClase')pedir({titulo:'¿Cancelar esta clase?',texto:'Se devuelve 1 clase a cada inscrita y se preparan los avisos.',boton:'Cancelar clase'},()=>res(cancelarClase(c)));
+  else if(act==='avisar')pedir({titulo:'Preparar avisos',texto:'Este mensaje se enviará por WhatsApp a cada alumna.',conTexto:true,valor:`Hola, un aviso sobre la clase ${cl(c).nombre} (${cuando(cl(c).ini)}): `,boton:'Preparar avisos'},t=>res(avisarClase(c,t.trim())));
+  else if(act==='recordar'){recordar(+b.dataset.a);setTimeout(render,0)}
+  else if(act==='hecho'){S.avisos.find(x=>x.id===+b.dataset.id).hecho=true;setTimeout(render,0)}
+  else if(act==='instr'){instr=b.dataset.n;render()}
+});
+document.addEventListener('change',e=>{
+  const b=e.target;if(b.dataset.act==='quien'){aid=+b.value;render()}
+  else if(b.dataset.act==='asis'){cl(+b.dataset.c).asis[+b.dataset.a]=b.checked;toast(b.checked?'Asistencia marcada.':'Asistencia quitada.')}
+});
+crearDemo();render();
+</script>
+</body>
+</html>
